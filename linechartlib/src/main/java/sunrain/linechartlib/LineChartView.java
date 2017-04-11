@@ -125,40 +125,28 @@ public class LineChartView extends View {
         int count = array.getIndexCount();
         for (int i = 0; i < count; i++) {
             int attr = array.getIndex(i);
-            switch (attr) {
-                case R.styleable.chartView_xylinecolor://xy坐标轴颜色
-                    xylinecolor = array.getColor(attr, xylinecolor);
-                    break;
-                case R.styleable.chartView_xylinewidth://xy坐标轴宽度
-                    xylinewidth = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, xylinewidth, getResources().getDisplayMetrics()));
-                    break;
-                case R.styleable.chartView_xytextcolor://xy坐标轴文字颜色
-                    xytextcolor = array.getColor(attr, xytextcolor);
-                    break;
-                case R.styleable.chartView_pastxtextcolor://xy坐标轴文字颜色
-                    pastxtextcolor = array.getColor(attr, pastxtextcolor);
-                    break;
-                case R.styleable.chartView_xytextsize://xy坐标轴文字大小
-                    xytextsize = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, xytextsize, getResources().getDisplayMetrics()));
-                    break;
-                case R.styleable.chartView_ytextsize://xy坐标轴文字大小
-                    ytextsize = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, ytextsize, getResources().getDisplayMetrics()));
-                    break;
-                case R.styleable.chartView_linecolor://折线图中折线的颜色
-                    linecolor = array.getColor(attr, linecolor);
-                    break;
-                case R.styleable.chartView_interval://x轴各个坐标点水平间距
-                    interval = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, interval, getResources().getDisplayMetrics()));
-                    break;
-                case R.styleable.chartView_bgcolor: //背景颜色
-                    bgcolor = array.getColor(attr, bgcolor);
-                    break;
-                case R.styleable.chartView_ystringcolor://y值对应的字体颜色
-                    ystringcolor = array.getColor(attr, ystringcolor);
-                    break;
-                case R.styleable.chartView_isScroll://是否在ACTION_UP时，根据速度进行自滑动
-                    isScroll = array.getBoolean(attr, isScroll);
-                    break;
+            if (attr == R.styleable.chartView_xylinecolor) {
+                xylinecolor = array.getColor(attr, xylinecolor);//xy坐标轴颜色
+            } else if (attr == R.styleable.chartView_xylinewidth) {//xy坐标轴宽度
+                xylinewidth = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, xylinewidth, getResources().getDisplayMetrics()));
+            }else if (attr == R.styleable.chartView_xytextcolor) {//过去时间坐标轴文字颜色
+                xytextcolor = array.getColor(attr, xytextcolor);
+            }else if (attr == R.styleable.chartView_pastxtextcolor) {//xy坐标轴文字颜色
+                pastxtextcolor = array.getColor(attr, pastxtextcolor);
+            }else if (attr == R.styleable.chartView_xytextsize) {//xy坐标轴文字大小
+                xytextsize = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, xytextsize, getResources().getDisplayMetrics()));
+            }else if (attr == R.styleable.chartView_ytextsize) {//xy坐标轴文字大小
+                ytextsize = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, ytextsize, getResources().getDisplayMetrics()));
+            }else if (attr == R.styleable.chartView_linecolor) {//折线图中折线的颜色
+                linecolor = array.getColor(attr, linecolor);
+            }else if (attr == R.styleable.chartView_interval) {//x轴各个坐标点水平间距
+                interval = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, interval, getResources().getDisplayMetrics()));
+            }else if (attr == R.styleable.chartView_bgcolor) { //背景颜色
+                bgcolor = array.getColor(attr, bgcolor);
+            }else if (attr == R.styleable.chartView_ystringcolor) {//y值对应的字体颜色
+                ystringcolor = array.getColor(attr, ystringcolor);
+            }else if (attr == R.styleable.chartView_isScroll) {//是否在ACTION_UP时，根据速度进行自滑动
+                isScroll = array.getBoolean(attr, isScroll);
             }
         }
         array.recycle();
