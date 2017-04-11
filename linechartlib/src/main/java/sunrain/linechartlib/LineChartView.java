@@ -27,8 +27,11 @@ import android.view.animation.DecelerateInterpolator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
  * 自定义折线图
@@ -41,6 +44,8 @@ public class LineChartView extends View {
     private int xylinewidth = dpToPx(1);
     //xy坐标轴文字颜色
     private int xytextcolor = 0xff7e7e7e;
+    //当前时间以前的字体颜色
+    private int pastxtextcolor = 0x4dffffff;
     //xy坐标轴文字大小
     private int xytextsize = spToPx(12);
     //折线图中折线的颜色
@@ -86,6 +91,8 @@ public class LineChartView extends View {
     private Rect xValueRect;
     //速度检测器
     private VelocityTracker velocityTracker;
+    //当前位置
+    private int position;
 
 
     private List<String> yDegreeString = new ArrayList<String>();
@@ -118,26 +125,40 @@ public class LineChartView extends View {
         int count = array.getIndexCount();
         for (int i = 0; i < count; i++) {
             int attr = array.getIndex(i);
-            if (attr == R.styleable.chartView_xylinecolor) {
-                xylinecolor = array.getColor(attr, xylinecolor);
-            } else if (attr == R.styleable.chartView_xylinewidth) {
-                xylinewidth = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, xylinewidth, getResources().getDisplayMetrics()));
-            }else if (attr == R.styleable.chartView_xytextcolor) {
-                xytextcolor = array.getColor(attr, xytextcolor);
-            }else if (attr == R.styleable.chartView_xytextsize) {
-                xytextsize = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, xytextsize, getResources().getDisplayMetrics()));
-            }else if (attr == R.styleable.chartView_ytextsize) {
-                ytextsize = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, ytextsize, getResources().getDisplayMetrics()));
-            }else if (attr == R.styleable.chartView_linecolor) {
-                linecolor = array.getColor(attr, linecolor);
-            }else if (attr == R.styleable.chartView_interval) {
-                interval = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, interval, getResources().getDisplayMetrics()));
-            }else if (attr == R.styleable.chartView_bgcolor) {
-                bgcolor = array.getColor(attr, bgcolor);
-            }else if (attr == R.styleable.chartView_ystringcolor) {
-                ystringcolor = array.getColor(attr, ystringcolor);
-            }else if (attr == R.styleable.chartView_isScroll) {
-                isScroll = array.getBoolean(attr, isScroll);
+            switch (attr) {
+                case R.styleable.chartView_xylinecolor://xy坐标轴颜色
+                    xylinecolor = array.getColor(attr, xylinecolor);
+                    break;
+                case R.styleable.chartView_xylinewidth://xy坐标轴宽度
+                    xylinewidth = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, xylinewidth, getResources().getDisplayMetrics()));
+                    break;
+                case R.styleable.chartView_xytextcolor://xy坐标轴文字颜色
+                    xytextcolor = array.getColor(attr, xytextcolor);
+                    break;
+                case R.styleable.chartView_pastxtextcolor://xy坐标轴文字颜色
+                    pastxtextcolor = array.getColor(attr, pastxtextcolor);
+                    break;
+                case R.styleable.chartView_xytextsize://xy坐标轴文字大小
+                    xytextsize = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, xytextsize, getResources().getDisplayMetrics()));
+                    break;
+                case R.styleable.chartView_ytextsize://xy坐标轴文字大小
+                    ytextsize = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, ytextsize, getResources().getDisplayMetrics()));
+                    break;
+                case R.styleable.chartView_linecolor://折线图中折线的颜色
+                    linecolor = array.getColor(attr, linecolor);
+                    break;
+                case R.styleable.chartView_interval://x轴各个坐标点水平间距
+                    interval = (int) array.getDimension(attr, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, interval, getResources().getDisplayMetrics()));
+                    break;
+                case R.styleable.chartView_bgcolor: //背景颜色
+                    bgcolor = array.getColor(attr, bgcolor);
+                    break;
+                case R.styleable.chartView_ystringcolor://y值对应的字体颜色
+                    ystringcolor = array.getColor(attr, ystringcolor);
+                    break;
+                case R.styleable.chartView_isScroll://是否在ACTION_UP时，根据速度进行自滑动
+                    isScroll = array.getBoolean(attr, isScroll);
+                    break;
             }
         }
         array.recycle();
@@ -270,12 +291,13 @@ public class LineChartView extends View {
             canvas.drawCircle(x, y, dp2, linePaint);*/
 
             linePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-            for(int j = 0; j < yDegreeValue.size(); j++){
+/*            for(int j = 0; j < yDegreeValue.size(); j++){
                 if(value.get(xValue.get(i))>=yDegreeValue.get(j)){
                     linePaint.setColor(pointColor.get(j));
                     break;
                 }
-            }
+            }*/
+            linePaint.setColor(Color.WHITE);
 /*            if(value.get(xValue.get(i))>=30){
                 linePaint.setColor(Color.RED);
             }else {
@@ -366,6 +388,11 @@ public class LineChartView extends View {
         float ys = yOri - yOri * (1 - 0.1f) * value.get(xValue.get(0)) / yValue.get(yValue.size() - 1);
         float xe = xInit + interval * 1;
         float ye = yOri - yOri * (1 - 0.1f) * value.get(xValue.get(1)) / yValue.get(yValue.size() - 1);
+        int yLength = (int) (yOri * (1 - 0.1f) / (yValue.size() - 1));
+
+        float ymax = yOri - yOri * (1 - 0.1f) * yDegreeValue.get(0) / yValue.get(yValue.size() - 1);
+        float ymin = yOri - yOri * (1 - 0.1f) * yDegreeValue.get(yDegreeValue.size()-2) / yValue.get(yValue.size() - 1);
+
         for (int i = 0; i < xValue.size() - 1; i++)
         {
             xs = xInit + interval * i;
@@ -380,21 +407,21 @@ public class LineChartView extends View {
             p4.y = (int)ye;
             p4.x = (int)wt;
 
-            //Shader mShader = new LinearGradient(xs, ys, 400+xs, 400+ys,
+            Shader mShader = new LinearGradient(xs, ymax, xs,ymin,
 
-                   // new int[] { Color.RED,  Color.YELLOW,Color.GREEN, Color.BLUE},
+                    integerListTointArray(pointColor),
 
-                    //null, Shader.TileMode.MIRROR);
+                    null, Shader.TileMode.CLAMP);
 
-            // Shader.TileMode三种模式
+/*             Shader.TileMode三种模式
 
-            // REPEAT:沿着渐变方向循环重复
+             REPEAT:沿着渐变方向循环重复
 
-            // CLAMP:如果在预先定义的范围外画的话，就重复边界的颜色
+             CLAMP:如果在预先定义的范围外画的话，就重复边界的颜色
 
-            // MIRROR:与REPEAT一样都是循环重复，但这个会对称重复
+             MIRROR:与REPEAT一样都是循环重复，但这个会对称重复*/
 
-            //linePaint.setShader(mShader);// 用Shader中定义定义的颜色来话
+            linePaint.setShader(mShader);// 用Shader中定义定义的颜色来话
             linePaint.setStyle(Paint.Style.STROKE);
             linePaint.setColor(linecolor);
 
@@ -402,6 +429,7 @@ public class LineChartView extends View {
             Path path = new Path();
             path.moveTo(xs, ys);
             path.cubicTo(p3.x, p3.y, p4.x, p4.y, xe, ye);
+            //canvas.drawRect(0, 0, yLength, yOri + xylinewidth / 2, linePaint);
             canvas.drawPath(path, linePaint);
         }
     }
@@ -493,7 +521,11 @@ public class LineChartView extends View {
         for (int i = 0; i < xValue.size(); i++) {
             float x = xInit + interval * i;
             if (x >= xOri) {//只绘制从原点开始的区域
-                xyTextPaint.setColor(xytextcolor);
+                if(i < position){
+                    xyTextPaint.setColor(pastxtextcolor);
+                }else {
+                    xyTextPaint.setColor(xytextcolor);
+                }
                 canvas.drawLine(x, yOri, x, yOri - length, xyPaint);
                 //绘制X轴文本
                 String text = xString.get(i);
@@ -748,7 +780,18 @@ public class LineChartView extends View {
         float density = getContext().getResources().getDisplayMetrics().density;
         return (int) (dp * density + 0.5f * (dp >= 0 ? 1 : -1));
     }
-
+    /**
+     * Integer[]转换为int[]
+     */
+    private int[] integerListTointArray(List<Integer> pointColor){
+        Integer[] integers = (Integer[])pointColor.toArray(new Integer[pointColor.size()]);
+        int[] intArray = new int[integers.length];
+        for(int i=0; i < integers.length; i ++)
+        {
+            intArray[i] = integers[i].intValue();
+        }
+        return intArray;
+    }
     /**
      * sp转化为px
      *
@@ -765,7 +808,8 @@ public class LineChartView extends View {
      * @param position
      */
     public void setCurrentPosition(int position){
-        xInit = - interval * position;
+        this.position = position;
+        xInit = - interval * (position - 4);
         invalidate();
     }
 

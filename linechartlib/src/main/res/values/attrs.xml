@@ -8,6 +8,8 @@
     <attr name="xytextcolor" format="color" />
     <!-- xy坐标轴文字大小 -->
     <attr name="xytextsize" format="dimension" />
+    <!-- 过去时间x坐标轴文字大小 -->
+    <attr name="pastxtextcolor" format="color" />
     <!-- y值对应文字大小 -->
     <attr name="ytextsize" format="dimension" />
     <!-- 折线图中折线的颜色 -->
@@ -24,6 +26,7 @@
         <attr name="xylinecolor" />
         <attr name="xylinewidth" />
         <attr name="xytextcolor" />
+        <attr name="pastxtextcolor" />
         <attr name="xytextsize" />
         <attr name="ytextsize" />
         <attr name="linecolor" />
