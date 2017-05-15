@@ -27,11 +27,8 @@ import android.view.animation.DecelerateInterpolator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Arrays.asList;
 
 /**
  * 自定义折线图
@@ -85,6 +82,10 @@ public class LineChartView extends View {
     private List<Integer> yValue = new ArrayList<>();
     //折线对应的数据
     private Map<String, Integer> value = new HashMap<>();
+
+    //折线对应的文字
+    private Map<String, String> yDegreemap = new HashMap<>();
+
     //点击的点对应的X轴的第几个点，默认1
     private int selectIndex = 1;
     //X轴刻度文本对应的最大矩形，为了选中时，在x轴文本画的框框大小一致
@@ -94,8 +95,6 @@ public class LineChartView extends View {
     //当前位置
     private int position;
 
-
-    private List<String> yDegreeString = new ArrayList<String>();
     private List<Integer> yDegreeValue = new ArrayList<>();
     private List<Integer> pointColor = new ArrayList<>();
 
@@ -194,7 +193,7 @@ public class LineChartView extends View {
             int dp2 = dpToPx(2);
             int dp3 = dpToPx(3);
             xOri = 0;
-           // xOri = (int) (dp2 + textYWdith + dp2 + xylinewidth);//dp2是y轴文本距离左边，以及距离y轴的距离
+            // xOri = (int) (dp2 + textYWdith + dp2 + xylinewidth);//dp2是y轴文本距离左边，以及距离y轴的距离
 //            //X轴文本最大高度
             xValueRect = getTextBounds("现在", xyTextPaint);
             float textXHeight = xValueRect.height();
@@ -292,8 +291,8 @@ public class LineChartView extends View {
                 linePaint.setColor(Color.BLUE);
             }*/
             canvas.drawCircle(x, y, dp2, linePaint);
-            drawFloatTextBox(canvas, x, y - dp7, changeFloatToText(value.get(xValue.get(i))));
-
+            //drawFloatTextBox(canvas, x, y - dp7, changeFloatToText(value.get(xValue.get(i))));
+            drawFloatTextBox(canvas, x, y - dp7,yDegreemap.get(i+""));
         }
     }
     /**
@@ -302,28 +301,9 @@ public class LineChartView extends View {
     private String changeFloatToText(float text){
         Log.e("YValue",""+text);
         String airDegree = "";
-
-/*        if(text >= 39){
-            airDegree = "严重";
-        }else if(text >= 36){
-            airDegree = "重度";
-        }else if(text >= 33){
-            airDegree = "中度";
-        }else if(text >= 30){
-            airDegree = "轻度";
-        }else if(text >= 27){
-            airDegree = "良";
-        }else{
-            airDegree = "优";
-        }*/
-
-        for (int i = 0; i < yDegreeValue.size(); i++) {
-            if(text >= yDegreeValue.get(i)){
-               airDegree = yDegreeString.get(i);
-                break;
-            }
+        for (int i = 0; i < yDegreemap.size(); i++) {
+            airDegree = yDegreemap.get(i+"");
         }
-
         return  airDegree;
     }
     /**
@@ -523,8 +503,8 @@ public class LineChartView extends View {
 //                    canvas.drawText(text, 0, text.length(), x - rect.width() / 2, yOri + xylinewidth + dpToPx(2) + rect.height(), xyTextPaint);
 //                    canvas.drawRoundRect(x - xValueRect.width() / 2 - dpToPx(3), yOri + xylinewidth + dpToPx(1), x + xValueRect.width() / 2 + dpToPx(3), yOri + xylinewidth + dpToPx(2) + xValueRect.height() + dpToPx(2), dpToPx(2), dpToPx(2), xyTextPaint);
 //                } else {
-                    canvas.drawText(text, 0, text.length(), x - rect.width() / 2, yOri + xylinewidth + dpToPx(2) + rect.height(), xyTextPaint);
-  //              }
+                canvas.drawText(text, 0, text.length(), x - rect.width() / 2, yOri + xylinewidth + dpToPx(2) + rect.height(), xyTextPaint);
+                //              }
             }
         }
     }
@@ -722,14 +702,16 @@ public class LineChartView extends View {
         invalidate();
     }
 
-    public void setValue(Map<String, Integer> value, List<String> xValue, List<Integer> yValue, List<String> xString,List<Integer> yDegreeValue,List<String> yDegreeString,List<Integer> pointColor) {
+    public void setValue(Map<String, Integer> value, List<String> xValue, List<Integer> yValue,
+                         List<String> xString,List<Integer> yDegreeValue,
+                         List<Integer> pointColor,Map<String,String> yDegreemap) {
         this.value = value;
         this.xValue = xValue;
         this.yValue = yValue;
         this.xString = xString;
         this.yDegreeValue = yDegreeValue;
-        this.yDegreeString = yDegreeString;
         this.pointColor = pointColor;
+        this.yDegreemap = yDegreemap;
         invalidate();
     }
 
